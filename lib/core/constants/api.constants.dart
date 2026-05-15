@@ -1,7 +1,21 @@
 class ApiConstants {
-  // Pointing to the secure Vercel Proxy URL
-  static const String baseUrl =
+  // true  = Local Flask Backend
+  // false = Production Vercel Proxy
+  static const bool useLocalApi = false;
+
+  // Used strictly for Android Emulators
+  static const String localAndroid = 'http://10.0.2.2:5000';
+
+  // Used for Flutter Web / iOS / Physical Devices
+  static const String localPhysical = 'http://127.0.0.1:5000';
+
+  // Production - Vercel-hf API
+  static const String productionApi =
       'https://proxy-corporate-phi35mini-nyde.vercel.app/api';
 
-  static const String rewriteUrl = '$baseUrl/rewrite';
+  // Updated getter to ensure Web points to 127.0.0.1
+  static String get baseUrl => useLocalApi ? localPhysical : productionApi;
+
+  static String get rewriteUrl => '$baseUrl/rewrite';
+  static String get healthUrl => '$baseUrl/health';
 }

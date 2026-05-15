@@ -1,5 +1,6 @@
 import 'package:corporate_filter/core/logger.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 // Note: If you want to use actual SVGs, add 'flutter_svg: ^2.0.0' (or latest)
 // to your pubspec.yaml and uncomment the import below.
@@ -68,7 +69,7 @@ void dispose() {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    logger.v("Inside build", tag: "in-BUILD");
+    // logger.v("Inside build", tag: "in-BUILD");
     // logger.e("NO ERROR", tag: "CHECK");
     // logger.d("SOMETING", tag: "D-TAG");
     // logger.w("CHECKING", tag: "WARNING-TAG");
@@ -113,18 +114,20 @@ void dispose() {
                   isSelected: selectedOption == 'a',
                   onTap: () => setState(() => selectedOption = 'a'),
                 ),
+                Gap(12),
                 OptionCard(
                   text: "Are you HR?",
                   isSelected: selectedOption == 'b',
                   onTap: () => setState(() => selectedOption = 'b'),
                 ),
+                Gap(12),
                 OptionCard(
                   text: "Are you an Employee?",
                   isSelected: selectedOption == 'c',
                   onTap: () => setState(() => selectedOption = 'c'),
                 ),
 
-                SizedBox(height: 20),
+                SizedBox(height: 32),
 
                 GestureDetector(
                   onTap: handleProceed,
@@ -133,7 +136,7 @@ void dispose() {
                     padding: EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
                       child: Text(
@@ -190,7 +193,7 @@ void dispose() {
 
                         // 2. Text
                         const Text(
-                          "YOUR TEXT",
+                          "CORPORATE CHAOS",
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w800,
@@ -201,11 +204,11 @@ void dispose() {
                         // 3. PNG Image or SVG Placeholder
                         // If using flutter_svg, replace this Icon with:
                         // SvgPicture.asset('assets/my_icon.svg', width: 20, height: 20),
-                        const Icon(Icons.bolt, color: Colors.black, size: 20),
+                        // const Icon(Icons.bolt, color: Colors.black, size: 20),
 
                         // 4. More Text
                         const Text(
-                          "WITH ICONS",
+                          "•  FILTERED BY AI",
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w800,
