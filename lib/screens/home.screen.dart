@@ -23,47 +23,56 @@ class _HomeScreenState extends State<HomeScreen>
   // 🔥 ADDED: Animation Controller for the continuous scroll
   late AnimationController _scrollController;
 
-  @override
-  void initState() {
-    super.initState();
-    // Duration controls the speed of the scroll. Lower = faster.
-    _scrollController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat(); // Loops indefinitely
-  }
+  // In initState():
+@override
+void initState() {
+  super.initState();
+  logger.i('HomeScreen mounted', tag: 'HOME');
+  _scrollController = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 3),
+  )..repeat();
+}
 
   @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
+void dispose() {
+  logger.i('HomeScreen disposed', tag: 'HOME');
+  _scrollController.dispose();
+  super.dispose();
+}
 
   void handleProceed() {
-    if (selectedOption == null) return;
-
-    Widget nextScreen;
-
-    if (selectedOption == 'a') {
-      nextScreen = ScreenA();
-    } else if (selectedOption == 'b') {
-      nextScreen = ScreenB();
-    } else {
-      nextScreen = ScreenC();
-    }
-
-    Navigator.push(context, MaterialPageRoute(builder: (_) => nextScreen));
+  if (selectedOption == null) {
+    logger.w('Proceed tapped but no option selected', tag: 'HOME');
+    return;
   }
+
+  logger.i('User selected option: $selectedOption — navigating', tag: 'HOME');
+
+  Widget nextScreen;
+  if (selectedOption == 'a') {
+    logger.d('Routing to ManagerScreen (ScreenA)', tag: 'HOME');
+    nextScreen = ScreenA();
+  } else if (selectedOption == 'b') {
+    logger.d('Routing to HRScreen (ScreenB)', tag: 'HOME');
+    nextScreen = ScreenB();
+  } else {
+    logger.d('Routing to EmployeeScreen (ScreenC)', tag: 'HOME');
+    nextScreen = ScreenC();
+  }
+
+  Navigator.push(context, MaterialPageRoute(builder: (_) => nextScreen));
+}
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     logger.v("Inside build", tag: "in-BUILD");
-    logger.e("NO ERROR", tag: "CHECK");
-    logger.d("SOMETING", tag: "D-TAG");
-    logger.w("CHECKING", tag: "WARNING-TAG");
-    logger.i("CHecking I", tag: "I-TAG");
+    // logger.e("NO ERROR", tag: "CHECK");
+    // logger.d("SOMETING", tag: "D-TAG");
+    // logger.w("CHECKING", tag: "WARNING-TAG");
+    // logger.i("CHecking I", tag: "I-TAG");
 
     return Scaffold(
       backgroundColor: Colors.black,
