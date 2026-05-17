@@ -17,7 +17,7 @@ class ScreenA extends StatelessWidget {
                 borderRadius: BorderRadius.circular(24)
               ),
               child: Image.asset(
-                "images/smashhhhhcat.jpg",
+                "assets/images/smashhhhhcat.jpg",
                 height: screenHeight/3,
                 width: screenHeight/3,
                 fit: BoxFit.contain,

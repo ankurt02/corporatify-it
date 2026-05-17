@@ -19,7 +19,7 @@ class _ScreenCState extends State<ScreenC> {
   bool _isLoading = false;
   bool _hasCopied = false;
 
-  // ── change this to your HF endpoint when deployed ──
+  // Ensure ApiConstants.rewriteUrl now points to LM Studio's /v1/chat/completions
   static final String _apiUrl = ApiConstants.rewriteUrl;
 
   @override
@@ -61,11 +61,33 @@ class _ScreenCState extends State<ScreenC> {
     final stopwatch = Stopwatch()..start();
 
     try {
+      // DYNAMIC PAYLOAD: Switch shape based on environment
+      final Map<String, dynamic> requestBody = ApiConstants.useLocalApi
+          ? {
+              // Local LM Studio Format
+              "model": "corporate-filter",
+              "messages": [
+                {
+                  "role": "system",
+                  "content":
+                      "You are a professional communication assistant. Rewrite the user's message into polished, professional corporate language. Return only the rewritten text.",
+                },
+                {"role": "user", "content": rawText},
+              ],
+              "temperature": 0.3,
+              "max_tokens": 256,
+            }
+          : {
+              // Production Hugging Face Format
+              "raw_text": rawText,
+            };
+
+      // SEND THE REQUEST
       final response = await http
           .post(
             Uri.parse(_apiUrl),
             headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({'raw_text': rawText}),
+            body: jsonEncode(requestBody), // Use the dynamic body here!
           )
           .timeout(const Duration(seconds: 1000));
 
@@ -78,7 +100,20 @@ class _ScreenCState extends State<ScreenC> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final professional = data['professional_text'] as String? ?? '';
+        String professional = '';
+
+        // DYNAMIC PARSER: Extract text based on environment
+        if (ApiConstants.useLocalApi) {
+          // Parse LM Studio format
+          if (data['choices'] != null && data['choices'].isNotEmpty) {
+            professional = data['choices'][0]['message']['content']
+                .toString()
+                .trim();
+          }
+        } else {
+          // Parse Hugging Face format
+          professional = data['professional_text']?.toString().trim() ?? '';
+        }
 
         logger.i(
           'Rewrite successful. Output length: ${professional.length} chars',
@@ -124,8 +159,6 @@ class _ScreenCState extends State<ScreenC> {
     });
   }
 
-  // ... Keep your imports and state variables intact
-
   @override
   Widget build(BuildContext context) {
     logger.v('ScreenC build()', tag: 'SCREEN-E');
@@ -142,14 +175,6 @@ class _ScreenCState extends State<ScreenC> {
             Navigator.pop(context);
           },
         ),
-        // title: const Text(
-        //   'Corporate Filter',
-        //   style: TextStyle(
-        //     color: Colors.amber,
-        //     fontWeight: FontWeight.bold,
-        //     letterSpacing: 1.2,
-        //   ),
-        // ),
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -158,16 +183,12 @@ class _ScreenCState extends State<ScreenC> {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  // Forces the column to be at least the size of the visible screen
-                  minHeight:
-                      constraints.maxHeight -
-                      48, // accounts for top/bottom padding
+                  minHeight: constraints.maxHeight - 48,
                 ),
                 child: IntrinsicHeight(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // ── Section label ──
                       const Text(
                         'Raw Text',
                         style: TextStyle(
@@ -178,8 +199,6 @@ class _ScreenCState extends State<ScreenC> {
                         ),
                       ),
                       const SizedBox(height: 10),
-
-                      // ── Input box ──
                       Container(
                         decoration: BoxDecoration(
                           color: const Color(0xFF111111),
@@ -207,8 +226,6 @@ class _ScreenCState extends State<ScreenC> {
                         ),
                       ),
                       const SizedBox(height: 20),
-
-                      // ── Professionalize button ──
                       Align(
                         alignment: Alignment.center,
                         child: GestureDetector(
@@ -238,8 +255,6 @@ class _ScreenCState extends State<ScreenC> {
                         ),
                       ),
                       const SizedBox(height: 36),
-
-                      // ── Response section ──
                       if (_isLoading) ...[
                         const Text(
                           'Professional Rewrite',
@@ -329,45 +344,52 @@ class _ScreenCState extends State<ScreenC> {
                           ),
                         ),
                       ],
-
-                      // ── Dynamic Spacer ──
-                      // Instead of the raw Spacer(), an Expanded block paired with
-                      // IntrinsicHeight safely pushes contents below it downward.
                       const Expanded(child: SizedBox(height: 24)),
-
-                      // ── Your Disclaimer Box ──
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF161616),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.amber.withOpacity(0.3),
-                            width: 1,
-                          ),
-                        ),
-                        child: const Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(
-                              Icons.info_outline,
-                              color: Colors.amber,
-                              size: 20,
-                            ),
-                            SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                'Disclaimer: This tool provides AI-generated content. Please review critical text outputs for accuracy before formal communication.\n\nThis assistant is powered by the Microsoft Phi-3.5-mini model and has been fine-tuned on a custom dataset of approximately 7,500 training samples. While it is optimized for domain-specific responses, outputs may occasionally be inaccurate or incomplete and should be independently verified when necessary.',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      Center(
+  child: ConstrainedBox(
+    constraints: BoxConstraints(
+      maxWidth: MediaQuery.of(context).size.width > 900 ? 850 : double.infinity,
+    ),
+    child: Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal:
+            MediaQuery.of(context).size.width > 900 ? 40 : 0,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF161616),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.amber.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: const Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.info_outline,
+              color: Colors.amber,
+              size: 20,
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Disclaimer: This tool provides AI-generated content. Please review critical text outputs for accuracy before formal communication.\nThis assistant is powered by the Microsoft Phi-3.5-mini (3.8B) model and has been fine-tuned on a custom dataset of approximately 7,500 training samples.\n\nPerformance Notice: As this live demo utilizes shared cloud infrastructure, processing times depend heavily on server load and can take anywhere from 1 to 9 minutes (60–550 seconds).',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 12,
+                  height: 1.4,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  ),
+),
                     ],
                   ),
                 ),
@@ -380,7 +402,6 @@ class _ScreenCState extends State<ScreenC> {
   }
 }
 
-/// Shimmer placeholder for loading state
 class _ShimmerBox extends StatelessWidget {
   const _ShimmerBox({Key? key}) : super(key: key);
 
