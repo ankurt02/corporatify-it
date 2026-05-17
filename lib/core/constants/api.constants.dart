@@ -11,7 +11,7 @@ class ApiConstants {
 
   // Production - Vercel-hf API
   static const String productionApi =
-      'https://ankurt02-corporate-filter-phi35-mini-merged.hf.space';
+      'https://ankurt02-corporate-filter-phi35-mini-merged.hf.space/rewrite';
 
   // Updated getter to ensure Web points to 127.0.0.1
   static String get baseUrl => useLocalApi ? localPhysical : productionApi;
