@@ -27,8 +27,9 @@ class ScreenB extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24),
               ),
+              clipBehavior: Clip.antiAlias,
               child: Image.asset(
-                "images/bleeeeeeh.jpg",
+                "assets/images/bleeeeeeh.jpg",
                 height: screenHeight / 3,
                 width: screenHeight / 3,
                 fit: BoxFit.contain,
