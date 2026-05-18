@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const bool useLocalApi = false; 
+  static const bool useLocalApi = true; 
 
   static const String localAndroid = 'http://10.0.2.2:1234/v1';
   static const String localPhysical = 'http://127.0.0.1:1234/v1';

@@ -16,11 +16,12 @@ class ScreenA extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24)
               ),
+              clipBehavior: Clip.antiAlias,
               child: Image.asset(
                 "assets/images/smashhhhhcat.jpg",
                 height: screenHeight/3,
                 width: screenHeight/3,
-                fit: BoxFit.contain,
+                fit: BoxFit.cover,
               ),
             ),
             Gap(32),
@@ -28,7 +29,7 @@ class ScreenA extends StatelessWidget {
               "You are the whole reason this website exits!",
               style: GoogleFonts.spaceMono(
                 color: Colors.grey.shade800,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
                 fontSize: 16,
                 letterSpacing: 0.2,
                 wordSpacing: 0.2

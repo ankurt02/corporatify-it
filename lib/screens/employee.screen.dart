@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:corporate_filter/core/constants/api.constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gap/gap.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 import 'package:corporate_filter/core/logger.dart';
@@ -180,7 +181,7 @@ class _ScreenCState extends State<ScreenC> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                   minHeight: constraints.maxHeight - 48,
@@ -189,17 +190,18 @@ class _ScreenCState extends State<ScreenC> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text(
-                        'Raw Text',
-                        style: TextStyle(
-                          color: Colors.amber,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
+                      // const Text(
+                      //   'Raw Text',
+                      //   style: TextStyle(
+                      //     color: Colors.amber,
+                      //     fontWeight: FontWeight.w600,
+                      //     fontSize: 13,
+                      //     letterSpacing: 1.0,
+                      //   ),
+                      // ),
+                      const SizedBox(height: 4),
                       Container(
+                        // margin: EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
                           color: const Color(0xFF111111),
                           borderRadius: BorderRadius.circular(14),
@@ -215,7 +217,7 @@ class _ScreenCState extends State<ScreenC> {
                           ),
                           cursorColor: Colors.amber,
                           decoration: const InputDecoration(
-                            hintText: 'enter ur raw text here',
+                            hintText: 'Enter your raw text here...',
                             hintStyle: TextStyle(
                               color: Colors.grey,
                               fontSize: 14,
@@ -240,7 +242,7 @@ class _ScreenCState extends State<ScreenC> {
                               color: _isLoading
                                   ? Colors.amber.withOpacity(0.5)
                                   : Colors.amber,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(16),
                             ),
                             child: Text(
                               _isLoading ? 'Processing...' : 'Professionalize',
@@ -251,6 +253,23 @@ class _ScreenCState extends State<ScreenC> {
                                 letterSpacing: 0.8,
                               ),
                             ),
+                          ),
+                        ),
+                      ),
+                      Gap(6),
+                      Container(
+                        height: 36,
+                        // decoration: BoxDecoration(
+                        //   border: Border.all(color: Colors.pink, width: 2),
+                        // ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "This assistant is powered by the Microsoft Phi-3.5-mini (3.8B) model and has been fine-tuned on a custom dataset of approximately 7,500 training samples.",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            height: 1.4,
                           ),
                         ),
                       ),
@@ -346,50 +365,54 @@ class _ScreenCState extends State<ScreenC> {
                       ],
                       const Expanded(child: SizedBox(height: 24)),
                       Center(
-  child: ConstrainedBox(
-    constraints: BoxConstraints(
-      maxWidth: MediaQuery.of(context).size.width > 900 ? 850 : double.infinity,
-    ),
-    child: Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal:
-            MediaQuery.of(context).size.width > 900 ? 40 : 0,
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFF161616),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.amber.withOpacity(0.3),
-            width: 1,
-          ),
-        ),
-        child: const Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(
-              Icons.info_outline,
-              color: Colors.amber,
-              size: 20,
-            ),
-            SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                'Disclaimer: This tool provides AI-generated content. Please review critical text outputs for accuracy before formal communication.\nThis assistant is powered by the Microsoft Phi-3.5-mini (3.8B) model and has been fine-tuned on a custom dataset of approximately 7,500 training samples.\n\nPerformance Notice: As this live demo utilizes shared cloud infrastructure, processing times depend heavily on server load and can take anywhere from 1 to 9 minutes (60–550 seconds).',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
-                  height: 1.4,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  ),
-),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width > 900
+                                ? 850
+                                : double.infinity,
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal:
+                                  MediaQuery.of(context).size.width > 900
+                                  ? 24
+                                  : 0,
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF161616),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.amber.withOpacity(0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: const Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    Icons.info_outline,
+                                    color: Colors.amber,
+                                    size: 20,
+                                  ),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      'Disclaimer: This tool provides AI-generated content. Please review critical text outputs for accuracy before formal communication.\n\nPerformance Notice: As this live demo utilizes shared cloud infrastructure, processing times depend heavily on server load and can take anywhere from 1-12 minutes.',
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 12,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),

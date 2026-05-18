@@ -16,7 +16,7 @@ class ScreenB extends StatelessWidget {
               "We will get back to u later!",
               style: GoogleFonts.spaceMono(
                 color: Colors.grey.shade800,
-                fontWeight: FontWeight.w400,
+                fontWeight: FontWeight.w600,
                 fontSize: 16,
                 letterSpacing: -0.2,
                 wordSpacing: 0.2,
@@ -32,7 +32,7 @@ class ScreenB extends StatelessWidget {
                 "assets/images/bleeeeeeh.jpg",
                 height: screenHeight / 3,
                 width: screenHeight / 3,
-                fit: BoxFit.contain,
+                fit: BoxFit.cover,
               ),
             ),
           ],
