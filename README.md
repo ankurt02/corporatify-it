@@ -1,5 +1,7 @@
 # Corporate Filter# Corporate-Speak Transformer
 
+### Because ‘What the fu#k is this?’ isn’t HR-safe.
+
 ## 🚀 Overview
 The **Corporate-Speak Transformer** is a full-stack AI "Style Transfer" application designed to translate informal, frustrated, slang-heavy, or abusive language into polished, professional, and sophisticated "Corporate Speak." 
 
