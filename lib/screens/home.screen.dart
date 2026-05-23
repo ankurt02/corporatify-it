@@ -3,11 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-// Note: If you want to use actual SVGs, add 'flutter_svg: ^2.0.0' (or latest)
-// to your pubspec.yaml and uncomment the import below.
-// import 'package:flutter_svg/flutter_svg.dart';
-
 import 'employee.screen.dart';
 import 'hr.screen.dart';
 import 'manager.screen.dart';
@@ -18,12 +13,10 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-// 🔥 ADDED: SingleTickerProviderStateMixin for the AnimationController
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   String? selectedOption;
 
-  // 🔥 ADDED: Animation Controller for the continuous scroll
   late AnimationController _scrollController;
 
   // In initState():
@@ -71,11 +64,6 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    // logger.v("Inside build", tag: "in-BUILD");
-    // logger.e("NO ERROR", tag: "CHECK");
-    // logger.d("SOMETING", tag: "D-TAG");
-    // logger.w("CHECKING", tag: "WARNING-TAG");
-    // logger.i("CHecking I", tag: "I-TAG");
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -164,7 +152,6 @@ class _HomeScreenState extends State<HomeScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Gap(8),
                       Row(
                         children: [
                           Gap(12),
@@ -281,11 +268,6 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ],
                       ),
-                      // Gap(16),
-                  
-                      // Spacer(),
-                  
-                      // Gap(8),
                       Row(
                         children: [
                           // Text(
@@ -341,18 +323,6 @@ class _HomeScreenState extends State<HomeScreen>
                           Gap(12),
                         ],
                       ),
-                  
-                      //   Text(
-                      //   "Made with Flutter",
-                      //   // 💛
-                      //   textAlign: TextAlign.start,
-                      //   style: TextStyle(
-                      //     fontSize: 13,
-                      //     color: Colors.grey.shade300,
-                      //     decoration: TextDecoration.none,
-                      //     fontWeight: FontWeight.w100,
-                      //   ),
-                      // ),
                     ],
                   ),
                 ),
@@ -389,19 +359,18 @@ class _HomeScreenState extends State<HomeScreen>
               offset: Offset(dx, 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                // Generate enough items to fill the wide container
                 children: List.generate(
                   20,
                   (index) => SizedBox(
                     width:
-                        itemWidth, // Force the repeating block to be exactly this wide
+                        itemWidth,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        // 1. Standard Flutter Icon
+                        // Standard Flutter Icon
                         const Icon(Icons.flare, color: Colors.black, size: 20),
 
-                        // 2. Text
+                        // Text
                         const Text(
                           "CORPORATE CHAOS",
                           style: TextStyle(
@@ -411,12 +380,12 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ),
 
-                        // 3. PNG Image or SVG Placeholder
+                        // PNG Image or SVG Placeholder
                         // If using flutter_svg, replace this Icon with:
                         // SvgPicture.asset('assets/my_icon.svg', width: 20, height: 20),
                         // const Icon(Icons.bolt, color: Colors.black, size: 20),
 
-                        // 4. More Text
+                        // More Text
                         const Text(
                           "•  FILTERED BY AI",
                           style: TextStyle(

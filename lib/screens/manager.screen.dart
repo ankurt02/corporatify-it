@@ -7,7 +7,6 @@ class ScreenA extends StatelessWidget {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      // appBar: AppBar(title: Text("Screen A")),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
