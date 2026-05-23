@@ -50,3 +50,5 @@ backend/
 
 features.md
 wake-api.md
+
+.env
