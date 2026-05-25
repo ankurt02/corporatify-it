@@ -1,14 +1,15 @@
 import 'package:corporate_filter/core/logger.dart';
+import 'package:corporate_filter/widgets/status.bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'employee.screen.dart';
 import 'hr.screen.dart';
 import 'manager.screen.dart';
 import '../widgets/qcard.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -48,13 +49,13 @@ class _HomeScreenState extends State<HomeScreen>
     Widget nextScreen;
     if (selectedOption == 'a') {
       logger.d('Routing to ManagerScreen (ScreenA)', tag: 'HOME');
-      nextScreen = ScreenA();
+      nextScreen = ManagerScreen();
     } else if (selectedOption == 'b') {
       logger.d('Routing to HRScreen (ScreenB)', tag: 'HOME');
-      nextScreen = ScreenB();
+      nextScreen = HRScreen();
     } else {
       logger.d('Routing to EmployeeScreen (ScreenC)', tag: 'HOME');
-      nextScreen = ScreenC();
+      nextScreen = EmployeeScreen();
     }
 
     Navigator.push(context, MaterialPageRoute(builder: (_) => nextScreen));
@@ -66,15 +67,13 @@ class _HomeScreenState extends State<HomeScreen>
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xFF050505),
       body: Stack(
         children: [
-          /// Background Strips (Static Cross Pattern, but animating content)
           Positioned.fill(
             child: Stack(
               alignment: Alignment.center,
               children: [
-                // Strip 1: Tilted downwards, scrolling Left
                 Transform.translate(
                   offset: Offset(0, screenHeight * 0.35),
                   child: Transform.rotate(
@@ -82,7 +81,6 @@ class _HomeScreenState extends State<HomeScreen>
                     child: buildStrip(screenWidth, isMovingLeft: true),
                   ),
                 ),
-                // Strip 2: Tilted upwards, scrolling Right
                 Transform.translate(
                   offset: Offset(0, screenHeight * 0.35),
                   child: Transform.rotate(
@@ -149,182 +147,7 @@ class _HomeScreenState extends State<HomeScreen>
                     //   width: 2
                     // )
                   // ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Gap(12),
-                          SvgPicture.asset(
-                            "assets/svg/branch01.svg",
-                            height: 16,
-                            width: 10,
-                            colorFilter: ColorFilter.mode(
-                              Colors.white,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                  
-                          Gap(6),
-                  
-                          Text(
-                            "main*",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                  
-                          Gap(16),
-                  
-                          SvgPicture.asset(
-                            "assets/svg/error01.svg",
-                            height: 16,
-                            width: 16,
-                            colorFilter: ColorFilter.mode(
-                              Colors.white,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          Gap(2),
-                  
-                          Text(
-                            "0",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                          Gap(6),
-                  
-                          SvgPicture.asset(
-                            "assets/svg/warnings01.svg",
-                            height: 16,
-                            width: 16,
-                            colorFilter: ColorFilter.mode(
-                              Colors.white,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                  
-                          Gap(2),
-                  
-                          Text(
-                            "0",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                  
-                          Gap(6),
-                  
-                          SvgPicture.asset(
-                            "assets/svg/warning02.svg",
-                            height: 16,
-                            width: 16,
-                            colorFilter: ColorFilter.mode(
-                              Colors.white,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                  
-                          Gap(2),
-                  
-                          Text(
-                            "0",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                        ],
-                      ),
-                  
-                      Row(
-                        children: [
-                          Text(
-                            "v1.0.2-release",
-                            style: GoogleFonts.robotoMono(
-                              fontSize: 12,
-                              color: Colors.grey.shade300,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                  
-                          Gap(16),
-                  
-                          Text(
-                            "host : github-pages",
-                            style: GoogleFonts.robotoMono(
-                              fontSize: 12,
-                              color: Colors.grey.shade300,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          // Text(
-                          //   "Spaces : 2",
-                          //   style: TextStyle(
-                          //     fontSize: 12,
-                          //     color: Colors.white,
-                          //     letterSpacing: 0,
-                          //   ),
-                          // ),
-                          Gap(20),
-                          Text(
-                            "UTF-8",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                  
-                          Gap(20),
-                          Text(
-                            "CRLF",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                  
-                          Gap(20),
-                  
-                          SvgPicture.asset(
-                            "assets/svg/curlybraces.svg",
-                            height: 16,
-                            width: 16,
-                            colorFilter: ColorFilter.mode(
-                              Colors.white,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                  
-                          Gap(2),
-                  
-                          Text(
-                            "Dart",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                          Gap(12),
-                        ],
-                      ),
-                    ],
-                  ),
+                  child: StatusBarWidget(),
                 ),
               ],
             ),

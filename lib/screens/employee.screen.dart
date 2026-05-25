@@ -7,14 +7,14 @@ import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 import 'package:corporate_filter/core/logger.dart';
 
-class ScreenC extends StatefulWidget {
-  const ScreenC({Key? key}) : super(key: key);
+class EmployeeScreen extends StatefulWidget {
+  const EmployeeScreen({Key? key}) : super(key: key);
 
   @override
-  State<ScreenC> createState() => _ScreenCState();
+  State<EmployeeScreen> createState() => _EmployeeScreenState();
 }
 
-class _ScreenCState extends State<ScreenC> {
+class _EmployeeScreenState extends State<EmployeeScreen> {
   final TextEditingController _inputController = TextEditingController();
   String? _professionalText;
   bool _isLoading = false;
