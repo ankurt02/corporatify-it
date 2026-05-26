@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:http/http.dart' as http;
-import 'package:shimmer/shimmer.dart';
+import 'package:lottie/lottie.dart';
 import 'package:corporate_filter/core/logger.dart';
 
 class EmployeeScreen extends StatefulWidget {
@@ -26,32 +26,143 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   @override
   void initState() {
     super.initState();
-    logger.i('ScreenC (Employee Screen) mounted', tag: 'SCREEN-E');
+    logger.i('Employee Screen mounted', tag: 'SCREEN-E');
   }
 
   @override
   void dispose() {
     _inputController.dispose();
-    logger.i('ScreenC (Employee Screen) disposed', tag: 'SCREEN-E');
+    logger.i('Employee Screen disposed', tag: 'SCREEN-E');
     super.dispose();
   }
+
+  // Future<void> _handleProfessionalize() async {
+  //   final rawText = _inputController.text.trim();
+
+  //   if (rawText.isEmpty) {
+  //     logger.w('User tapped Professionalize with empty input', tag: 'SCREEN-E');
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Please enter some text first.'),
+  //         backgroundColor: Colors.amber,
+  //       ),
+  //     );
+  //     return;
+  //   }
+
+  //   logger.i('User initiated rewrite request', tag: 'SCREEN-E');
+  //   logger.d('Request body → raw_text: "$rawText"', tag: 'API-REQUEST');
+
+  //   setState(() {
+  //     _isLoading = true;
+  //     _professionalText = null;
+  //     _hasCopied = false;
+  //   });
+
+  //   final stopwatch = Stopwatch()..start();
+
+  //   try {
+  //     // DYNAMIC PAYLOAD: Switch shape based on environment
+  //     final Map<String, dynamic> requestBody = ApiConstants.useLocalApi
+  //         ? {
+  //             // Local LM Studio Format
+  //             "model": "corporate-filter",
+  //             "messages": [
+  //               {
+  //                 "role": "system",
+  //                 "content":
+  //                     "You are a professional communication assistant. Rewrite the user's message into polished, professional corporate language. Return only the rewritten text.",
+  //               },
+  //               {"role": "user", "content": rawText},
+  //             ],
+  //             "temperature": 0.3,
+  //             "max_tokens": 256,
+  //           }
+  //         : {
+  //             // Production Hugging Face Format
+  //             "raw_text": rawText,
+  //           };
+
+  //     // SEND THE REQUEST
+  //     final response = await http
+  //         .post(
+  //           Uri.parse(_apiUrl),
+  //           headers: {'Content-Type': 'application/json'},
+  //           body: jsonEncode(requestBody), // Use the dynamic body here!
+  //         )
+  //         .timeout(const Duration(seconds: 1000));
+
+  //     stopwatch.stop();
+  //     logger.i(
+  //       'Response received — status: ${response.statusCode} | elapsed: ${stopwatch.elapsedMilliseconds}ms',
+  //       tag: 'API-RESPONSE',
+  //     );
+  //     logger.d('Response body: ${response.body}', tag: 'API-RESPONSE');
+
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(response.body);
+  //       String professional = '';
+
+  //       // DYNAMIC PARSER: Extract text based on environment
+  //       if (ApiConstants.useLocalApi) {
+  //         // Parse LM Studio format
+  //         if (data['choices'] != null && data['choices'].isNotEmpty) {
+  //           professional = data['choices'][0]['message']['content']
+  //               .toString()
+  //               .trim();
+  //         }
+  //       } else {
+  //         // Parse Hugging Face format
+  //         professional = data['professional_text']?.toString().trim() ?? '';
+  //       }
+
+  //       logger.i(
+  //         'Rewrite successful. Output length: ${professional.length} chars',
+  //         tag: 'API-RESPONSE',
+  //       );
+
+  //       setState(() {
+  //         _professionalText = professional;
+  //       });
+  //     } else {
+  //       logger.e(
+  //         'API returned non-200: ${response.statusCode} → ${response.body}',
+  //         tag: 'API-ERROR',
+  //       );
+  //       _showError('Server error (${response.statusCode}). Try again.');
+  //     }
+  //   } catch (e, stackTrace) {
+  //     stopwatch.stop();
+  //     logger.e(
+  //       'Network/HTTP error after ${stopwatch.elapsedMilliseconds}ms: $e',
+  //       tag: 'API-ERROR',
+  //     );
+  //     logger.v('Stack trace: $stackTrace', tag: 'API-ERROR');
+  //     _showError('Could not process your request right now. Please try again.');
+  //   } finally {
+  //     setState(() => _isLoading = false);
+  //   }
+  // }
 
   Future<void> _handleProfessionalize() async {
     final rawText = _inputController.text.trim();
 
     if (rawText.isEmpty) {
-      logger.w('User tapped Professionalize with empty input', tag: 'SCREEN-E');
+      logger.w(
+        "User tapped Professionalize with empty input",
+        tag: 'Invalid Input',
+      );
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter some text first.'),
+        SnackBar(
+          content: Text("Please enter some text."),
           backgroundColor: Colors.amber,
         ),
       );
       return;
     }
 
-    logger.i('User initiated rewrite request', tag: 'SCREEN-E');
-    logger.d('Request body → raw_text: "$rawText"', tag: 'API-REQUEST');
+    logger.i("User intitated rewrite request", tag: "Request Initiated");
+    logger.d('Request body -> raw_text : "$rawText"', tag: 'API-REQUEST');
 
     setState(() {
       _isLoading = true;
@@ -60,87 +171,78 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     });
 
     final stopwatch = Stopwatch()..start();
+    // starting a 4 second timer to show animation
+
+    final minDelayFuture = Future.delayed(Duration(seconds: 4));
 
     try {
-      // DYNAMIC PAYLOAD: Switch shape based on environment
       final Map<String, dynamic> requestBody = ApiConstants.useLocalApi
           ? {
-              // Local LM Studio Format
               "model": "corporate-filter",
               "messages": [
-                {
-                  "role": "system",
-                  "content":
-                      "You are a professional communication assistant. Rewrite the user's message into polished, professional corporate language. Return only the rewritten text.",
-                },
+                {"role": "system", "content": "You are a professional communication assistant. Rewrite the user's message into polished, professional corporate language. Return only the rewritten text."},
                 {"role": "user", "content": rawText},
               ],
               "temperature": 0.3,
               "max_tokens": 256,
             }
-          : {
-              // Production Hugging Face Format
-              "raw_text": rawText,
-            };
+          : {"raw_text": rawText};
 
-      // SEND THE REQUEST
       final response = await http
           .post(
             Uri.parse(_apiUrl),
             headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(requestBody), // Use the dynamic body here!
+            body: jsonEncode(requestBody),
           )
-          .timeout(const Duration(seconds: 1000));
+          .timeout(Duration(seconds: 1000));
 
       stopwatch.stop();
       logger.i(
-        'Response received — status: ${response.statusCode} | elapsed: ${stopwatch.elapsedMilliseconds}ms',
-        tag: 'API-RESPONSE',
+        'Response received - status : ${response.statusCode} | elapsed : ${stopwatch.elapsedMilliseconds}ms',
+        tag: "API-RESPONSE",
       );
-      logger.d('Response body: ${response.body}', tag: 'API-RESPONSE');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         String professional = '';
 
-        // DYNAMIC PARSER: Extract text based on environment
         if (ApiConstants.useLocalApi) {
-          // Parse LM Studio format
           if (data['choices'] != null && data['choices'].isNotEmpty) {
             professional = data['choices'][0]['message']['content']
                 .toString()
                 .trim();
           }
         } else {
-          // Parse Hugging Face format
           professional = data['professional_text']?.toString().trim() ?? '';
         }
 
         logger.i(
-          'Rewrite successful. Output length: ${professional.length} chars',
-          tag: 'API-RESPONSE',
+          'Rewrite successful. Output length : ${professional.length} chars',
+          tag: 'API-RESPONSE-LEN',
         );
+
+        await minDelayFuture;
 
         setState(() {
           _professionalText = professional;
         });
       } else {
         logger.e(
-          'API returned non-200: ${response.statusCode} → ${response.body}',
+          'API returned non-200 : ${response.statusCode} -> ${response.body}',
           tag: 'API-ERROR',
         );
-        _showError('Server error (${response.statusCode}). Try again.');
+        _showError('Error : (${response.statusCode}). Try again');
       }
-    } catch (e, stackTrace) {
-      stopwatch.stop();
-      logger.e(
-        'Network/HTTP error after ${stopwatch.elapsedMilliseconds}ms: $e',
-        tag: 'API-ERROR',
+    } catch (e) {
+      if (stopwatch.isRunning) stopwatch.stop();
+      logger.e('Network/HTTP error: $e', tag: 'API-ERROR');
+      _showError(
+        'Could not process your reqeust right now. Please try again later',
       );
-      logger.v('Stack trace: $stackTrace', tag: 'API-ERROR');
-      _showError('Could not process your request right now. Please try again.');
     } finally {
-      setState(() => _isLoading = false);
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -170,7 +272,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
         backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.amber),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFFC8C8C8)),
           onPressed: () {
             logger.i('User navigated back from ScreenC', tag: 'SCREEN-E');
             Navigator.pop(context);
@@ -209,8 +311,8 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                         ),
                         child: TextField(
                           controller: _inputController,
-                          minLines: 5,
-                          maxLines: 10,
+                          minLines: 3,
+                          maxLines: 5,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 15,
@@ -273,27 +375,35 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 36),
+                      const SizedBox(height: 36),                      
+                      // Lottie Loading State (Shows if loading, or if API finished but we are still waiting out the 4s minimum)
                       if (_isLoading) ...[
                         const Text(
-                          'Professional Rewrite',
+                          'Generating Rewrite...',
                           style: TextStyle(
-                            color: Colors.amber,
+                            color: Color(0xFFC8C8C8),
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
                             letterSpacing: 1.0,
                           ),
                         ),
                         const SizedBox(height: 10),
-                        const _ShimmerBox(),
-                      ] else if (_professionalText != null) ...[
+                        Center(
+                          child: SizedBox(
+                            height: 180, // Adjust dimensions as needed for your JSON file
+                            child: Lottie.asset('assets/lottie/sparkle_loading.json'),
+                          ),
+                        ),
+                      ] 
+                      // Success State (Only shows once loading finishes and data is populated)
+                      else if (_professionalText != null) ...[
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
                               'Professional Rewrite',
                               style: TextStyle(
-                                color: Colors.amber,
+                                color: Color(0xFFC8C8C8),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13,
                                 letterSpacing: 1.0,
@@ -307,37 +417,17 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                     ? const Row(
                                         key: ValueKey('copied'),
                                         children: [
-                                          Icon(
-                                            Icons.check,
-                                            color: Colors.greenAccent,
-                                            size: 16,
-                                          ),
+                                          Icon(Icons.check, color: Colors.greenAccent, size: 16),
                                           SizedBox(width: 4),
-                                          Text(
-                                            'Copied!',
-                                            style: TextStyle(
-                                              color: Colors.greenAccent,
-                                              fontSize: 13,
-                                            ),
-                                          ),
+                                          Text('Copied!', style: TextStyle(color: Colors.greenAccent, fontSize: 13)),
                                         ],
                                       )
                                     : const Row(
                                         key: ValueKey('copy'),
                                         children: [
-                                          Icon(
-                                            Icons.copy,
-                                            color: Colors.amber,
-                                            size: 16,
-                                          ),
+                                          Icon(Icons.copy, color: Colors.amber, size: 16),
                                           SizedBox(width: 4),
-                                          Text(
-                                            'Copy',
-                                            style: TextStyle(
-                                              color: Colors.amber,
-                                              fontSize: 13,
-                                            ),
-                                          ),
+                                          Text('Copy', style: TextStyle(color: Colors.amber, fontSize: 13)),
                                         ],
                                       ),
                               ),
@@ -425,37 +515,37 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   }
 }
 
-class _ShimmerBox extends StatelessWidget {
-  const _ShimmerBox({Key? key}) : super(key: key);
+// class _ShimmerBox extends StatelessWidget {
+//   const _ShimmerBox({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: const Color(0xFF1E1E1E),
-      highlightColor: const Color(0xFF2C2C2C),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _shimmerLine(double.infinity, 14),
-          const SizedBox(height: 10),
-          _shimmerLine(double.infinity, 14),
-          const SizedBox(height: 10),
-          _shimmerLine(double.infinity, 14),
-          const SizedBox(height: 10),
-          _shimmerLine(200, 14),
-        ],
-      ),
-    );
-  }
+//   @override
+//   Widget build(BuildContext context) {
+//     return Shimmer.fromColors(
+//       baseColor: const Color(0xFF1E1E1E),
+//       highlightColor: const Color(0xFF2C2C2C),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           _shimmerLine(double.infinity, 14),
+//           const SizedBox(height: 10),
+//           _shimmerLine(double.infinity, 14),
+//           const SizedBox(height: 10),
+//           _shimmerLine(double.infinity, 14),
+//           const SizedBox(height: 10),
+//           _shimmerLine(200, 14),
+//         ],
+//       ),
+//     );
+//   }
 
-  Widget _shimmerLine(double width, double height) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
-      ),
-    );
-  }
-}
+//   Widget _shimmerLine(double width, double height) {
+//     return Container(
+//       width: width,
+//       height: height,
+//       decoration: BoxDecoration(
+//         color: Colors.white,
+//         borderRadius: BorderRadius.circular(6),
+//       ),
+//     );
+//   }
+// }

@@ -44,6 +44,7 @@ dependencies:
   shimmer: ^3.0.0
   http: ^1.6.0
   flutter_svg: ^2.3.0
+  lottie: ^3.3.3
 
 
 dev_dependencies:
@@ -72,6 +73,7 @@ flutter:
   assets:
     - assets/images/
     - assets/svg/
+    - assets/lottie/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
