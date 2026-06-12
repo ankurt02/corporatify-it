@@ -45,6 +45,7 @@ dependencies:
   http: ^1.6.0
   flutter_svg: ^2.3.0
   lottie: ^3.3.3
+  flutter_bloc: ^9.1.1
 
 
 dev_dependencies:

@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:corporate_filter/core/constants/api.constants.dart';
+import 'package:corporate_filter/core/theme/app.theme.dart';
+import 'package:corporate_filter/core/theme/theme.cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
@@ -20,7 +23,6 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   bool _isLoading = false;
   bool _hasCopied = false;
 
-  // Ensure ApiConstants.rewriteUrl now points to LM Studio's /v1/chat/completions
   static final String _apiUrl = ApiConstants.rewriteUrl;
 
   @override
@@ -36,114 +38,6 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     super.dispose();
   }
 
-  // Future<void> _handleProfessionalize() async {
-  //   final rawText = _inputController.text.trim();
-
-  //   if (rawText.isEmpty) {
-  //     logger.w('User tapped Professionalize with empty input', tag: 'SCREEN-E');
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //         content: Text('Please enter some text first.'),
-  //         backgroundColor: Colors.amber,
-  //       ),
-  //     );
-  //     return;
-  //   }
-
-  //   logger.i('User initiated rewrite request', tag: 'SCREEN-E');
-  //   logger.d('Request body → raw_text: "$rawText"', tag: 'API-REQUEST');
-
-  //   setState(() {
-  //     _isLoading = true;
-  //     _professionalText = null;
-  //     _hasCopied = false;
-  //   });
-
-  //   final stopwatch = Stopwatch()..start();
-
-  //   try {
-  //     // DYNAMIC PAYLOAD: Switch shape based on environment
-  //     final Map<String, dynamic> requestBody = ApiConstants.useLocalApi
-  //         ? {
-  //             // Local LM Studio Format
-  //             "model": "corporate-filter",
-  //             "messages": [
-  //               {
-  //                 "role": "system",
-  //                 "content":
-  //                     "You are a professional communication assistant. Rewrite the user's message into polished, professional corporate language. Return only the rewritten text.",
-  //               },
-  //               {"role": "user", "content": rawText},
-  //             ],
-  //             "temperature": 0.3,
-  //             "max_tokens": 256,
-  //           }
-  //         : {
-  //             // Production Hugging Face Format
-  //             "raw_text": rawText,
-  //           };
-
-  //     // SEND THE REQUEST
-  //     final response = await http
-  //         .post(
-  //           Uri.parse(_apiUrl),
-  //           headers: {'Content-Type': 'application/json'},
-  //           body: jsonEncode(requestBody), // Use the dynamic body here!
-  //         )
-  //         .timeout(const Duration(seconds: 1000));
-
-  //     stopwatch.stop();
-  //     logger.i(
-  //       'Response received — status: ${response.statusCode} | elapsed: ${stopwatch.elapsedMilliseconds}ms',
-  //       tag: 'API-RESPONSE',
-  //     );
-  //     logger.d('Response body: ${response.body}', tag: 'API-RESPONSE');
-
-  //     if (response.statusCode == 200) {
-  //       final data = jsonDecode(response.body);
-  //       String professional = '';
-
-  //       // DYNAMIC PARSER: Extract text based on environment
-  //       if (ApiConstants.useLocalApi) {
-  //         // Parse LM Studio format
-  //         if (data['choices'] != null && data['choices'].isNotEmpty) {
-  //           professional = data['choices'][0]['message']['content']
-  //               .toString()
-  //               .trim();
-  //         }
-  //       } else {
-  //         // Parse Hugging Face format
-  //         professional = data['professional_text']?.toString().trim() ?? '';
-  //       }
-
-  //       logger.i(
-  //         'Rewrite successful. Output length: ${professional.length} chars',
-  //         tag: 'API-RESPONSE',
-  //       );
-
-  //       setState(() {
-  //         _professionalText = professional;
-  //       });
-  //     } else {
-  //       logger.e(
-  //         'API returned non-200: ${response.statusCode} → ${response.body}',
-  //         tag: 'API-ERROR',
-  //       );
-  //       _showError('Server error (${response.statusCode}). Try again.');
-  //     }
-  //   } catch (e, stackTrace) {
-  //     stopwatch.stop();
-  //     logger.e(
-  //       'Network/HTTP error after ${stopwatch.elapsedMilliseconds}ms: $e',
-  //       tag: 'API-ERROR',
-  //     );
-  //     logger.v('Stack trace: $stackTrace', tag: 'API-ERROR');
-  //     _showError('Could not process your request right now. Please try again.');
-  //   } finally {
-  //     setState(() => _isLoading = false);
-  //   }
-  // }
-
   Future<void> _handleProfessionalize() async {
     final rawText = _inputController.text.trim();
 
@@ -154,7 +48,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
       );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Please enter some text."),
+          content: const Text("Please enter some text."),
           backgroundColor: Colors.amber,
         ),
       );
@@ -171,9 +65,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     });
 
     final stopwatch = Stopwatch()..start();
-    // starting a 4 second timer to show animation
-
-    final minDelayFuture = Future.delayed(Duration(seconds: 4));
+    final minDelayFuture = Future.delayed(const Duration(seconds: 4));
 
     try {
       final Map<String, dynamic> requestBody = ApiConstants.useLocalApi
@@ -194,7 +86,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode(requestBody),
           )
-          .timeout(Duration(seconds: 1000));
+          .timeout(const Duration(seconds: 1000));
 
       stopwatch.stop();
       logger.i(
@@ -266,18 +158,69 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   Widget build(BuildContext context) {
     logger.v('ScreenC build()', tag: 'SCREEN-E');
 
+    // Theme references extracting the 4 design palette colors cleanly
+    final currentTheme = Theme.of(context);
+final primaryColor = currentTheme.primaryColorRef;
+final backgroundColor = currentTheme.backgroundColorRef;
+final textColor = currentTheme.textColorRef;
+final dimColor = currentTheme.dimColorRef;
+final mutedTextColor = currentTheme.mutedTextColorRef; // <-- Add this line
+
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: backgroundColor, // Dynamically driven background
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFFC8C8C8)),
+          icon: Icon(Icons.arrow_back_ios_new, color: textColor.withOpacity(0.7)),
           onPressed: () {
             logger.i('User navigated back from ScreenC', tag: 'SCREEN-E');
             Navigator.pop(context);
           },
         ),
+        actions: [
+          // Theme switch list-style button implemented dynamically into AppBar action deck
+          BlocBuilder<ThemeCubit, ThemeState>(
+            builder: (context, state) {
+              IconData icon;
+              String label;
+
+              switch (state.themeMode) {
+                case AppThemeMode.light:
+                  icon = Icons.wb_sunny_outlined;
+                  label = 'Light mode';
+                  break;
+                case AppThemeMode.dark:
+                  icon = Icons.dark_mode_outlined;
+                  label = 'Dark mode';
+                  break;
+                case AppThemeMode.original:
+                  icon = Icons.auto_awesome_outlined;
+                  label = 'Corporate';
+                  break;
+              }
+
+              return Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: TextButton.icon(
+                  onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+                  icon: Icon(icon, color: textColor.withOpacity(0.8), size: 20),
+                  label: Text(
+                    label,
+                    style: TextStyle(
+                      color: textColor.withOpacity(0.8),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -292,39 +235,29 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // const Text(
-                      //   'Raw Text',
-                      //   style: TextStyle(
-                      //     color: Colors.amber,
-                      //     fontWeight: FontWeight.w600,
-                      //     fontSize: 13,
-                      //     letterSpacing: 1.0,
-                      //   ),
-                      // ),
                       const SizedBox(height: 4),
                       Container(
-                        // margin: EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF111111),
+                          color: dimColor, // Uses context "dim" surface layer
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: Colors.grey, width: 1),
+                          border: Border.all(color: primaryColor.withOpacity(0.5), width: 1),
                         ),
                         child: TextField(
                           controller: _inputController,
                           minLines: 3,
                           maxLines: 5,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: textColor,
                             fontSize: 15,
                           ),
-                          cursorColor: Colors.amber,
-                          decoration: const InputDecoration(
+                          cursorColor: primaryColor,
+                          decoration: InputDecoration(
                             hintText: 'Enter your raw text here...',
                             hintStyle: TextStyle(
-                              color: Colors.grey,
+                              color: textColor.withOpacity(0.4),
                               fontSize: 14,
                             ),
-                            contentPadding: EdgeInsets.all(16),
+                            contentPadding: const EdgeInsets.all(16),
                             border: InputBorder.none,
                           ),
                         ),
@@ -342,14 +275,14 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                             ),
                             decoration: BoxDecoration(
                               color: _isLoading
-                                  ? Colors.amber.withOpacity(0.5)
-                                  : Colors.amber,
+                                  ? primaryColor.withOpacity(0.5)
+                                  : primaryColor,
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Text(
                               _isLoading ? 'Processing...' : 'Professionalize',
-                              style: const TextStyle(
-                                color: Colors.black,
+                              style: TextStyle(
+                                color: currentTheme.brightness == Brightness.light ? Colors.white : Colors.black,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
                                 letterSpacing: 0.8,
@@ -358,30 +291,27 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                           ),
                         ),
                       ),
-                      Gap(6),
+                      const Gap(6),
                       Container(
-                        height: 36,
-                        // decoration: BoxDecoration(
-                        //   border: Border.all(color: Colors.pink, width: 2),
-                        // ),
+                        height: 45,
                         alignment: Alignment.center,
                         child: Text(
                           "This assistant is powered by the Microsoft Phi-3.5-mini (3.8B) model and has been fine-tuned on a custom dataset of approximately 7,500 training samples.",
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 12,
+                            color: mutedTextColor,
+                            fontSize: 11,
                             fontWeight: FontWeight.w500,
                             height: 1.4,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 36),                      
-                      // Lottie Loading State (Shows if loading, or if API finished but we are still waiting out the 4s minimum)
+                      const SizedBox(height: 36),
                       if (_isLoading) ...[
-                        const Text(
+                        Text(
                           'Generating Rewrite...',
                           style: TextStyle(
-                            color: Color(0xFFC8C8C8),
+                            color: textColor.withOpacity(0.7),
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
                             letterSpacing: 1.0,
@@ -390,20 +320,19 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                         const SizedBox(height: 10),
                         Center(
                           child: SizedBox(
-                            height: 180, // Adjust dimensions as needed for your JSON file
+                            height: 180,
                             child: Lottie.asset('assets/lottie/sparkle_loading.json'),
                           ),
                         ),
-                      ] 
-                      // Success State (Only shows once loading finishes and data is populated)
+                      ]
                       else if (_professionalText != null) ...[
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                            Text(
                               'Professional Rewrite',
                               style: TextStyle(
-                                color: Color(0xFFC8C8C8),
+                                color: textColor.withOpacity(0.7),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13,
                                 letterSpacing: 1.0,
@@ -422,12 +351,12 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                           Text('Copied!', style: TextStyle(color: Colors.greenAccent, fontSize: 13)),
                                         ],
                                       )
-                                    : const Row(
-                                        key: ValueKey('copy'),
+                                    : Row(
+                                        key: const ValueKey('copy'),
                                         children: [
-                                          Icon(Icons.copy, color: Colors.amber, size: 16),
-                                          SizedBox(width: 4),
-                                          Text('Copy', style: TextStyle(color: Colors.amber, fontSize: 13)),
+                                          Icon(Icons.copy, color: primaryColor, size: 16),
+                                          const SizedBox(width: 4),
+                                          Text('Copy', style: TextStyle(color: primaryColor, fontSize: 13)),
                                         ],
                                       ),
                               ),
@@ -439,14 +368,14 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF111111),
+                            color: dimColor,
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: Colors.grey, width: 1),
+                            border: Border.all(color: primaryColor.withOpacity(0.5), width: 1),
                           ),
                           child: SelectableText(
                             _professionalText!,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: textColor,
                               fontSize: 15,
                               height: 1.6,
                             ),
@@ -463,35 +392,32 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                           ),
                           child: Padding(
                             padding: EdgeInsets.symmetric(
-                              horizontal:
-                                  MediaQuery.of(context).size.width > 900
-                                  ? 24
-                                  : 0,
+                              horizontal: MediaQuery.of(context).size.width > 900 ? 24 : 0,
                             ),
                             child: Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF161616),
+                                color: dimColor.withOpacity(0.6),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: Colors.amber.withOpacity(0.3),
+                                  color: primaryColor.withOpacity(0.3),
                                   width: 1,
                                 ),
                               ),
-                              child: const Row(
+                              child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Icon(
                                     Icons.info_outline,
-                                    color: Colors.amber,
+                                    color: primaryColor,
                                     size: 20,
                                   ),
-                                  SizedBox(width: 12),
+                                  const SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
                                       'Disclaimer: This tool provides AI-generated content. Please review critical text outputs for accuracy before formal communication.\n\nPerformance Notice: As this live demo utilizes shared cloud infrastructure, processing times depend heavily on server load and can take anywhere from 1-12 minutes.',
                                       style: TextStyle(
-                                        color: Colors.grey,
+                                        color: textColor.withOpacity(0.6),
                                         fontSize: 12,
                                         height: 1.4,
                                       ),
@@ -514,38 +440,3 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     );
   }
 }
-
-// class _ShimmerBox extends StatelessWidget {
-//   const _ShimmerBox({Key? key}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Shimmer.fromColors(
-//       baseColor: const Color(0xFF1E1E1E),
-//       highlightColor: const Color(0xFF2C2C2C),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           _shimmerLine(double.infinity, 14),
-//           const SizedBox(height: 10),
-//           _shimmerLine(double.infinity, 14),
-//           const SizedBox(height: 10),
-//           _shimmerLine(double.infinity, 14),
-//           const SizedBox(height: 10),
-//           _shimmerLine(200, 14),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _shimmerLine(double width, double height) {
-//     return Container(
-//       width: width,
-//       height: height,
-//       decoration: BoxDecoration(
-//         color: Colors.white,
-//         borderRadius: BorderRadius.circular(6),
-//       ),
-//     );
-//   }
-// }

@@ -1,26 +1,29 @@
 import 'package:corporate_filter/screens/splash.screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'core/theme/theme.cubit.dart';
 
 void main() {
-  runApp(const CorporateFilterApp());
+  runApp(const MyApp());
 }
 
-class CorporateFilterApp extends StatelessWidget {
-  const CorporateFilterApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Corporate Filter',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.indigo,
-        ),
-        useMaterial3: true,
+    return BlocProvider(
+      create: (context) => ThemeCubit(),
+      child: BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context, state) {
+          return MaterialApp(
+            title: 'Corporate Filter',
+            debugShowCheckedModeBanner: false,
+            theme: state.themeData,
+            home: SplashScreen(),
+          );
+        },
       ),
-
-      home: SplashScreen(),
     );
   }
 }
